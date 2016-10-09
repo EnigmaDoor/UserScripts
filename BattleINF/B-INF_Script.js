@@ -1,4 +1,4 @@
-/*
+/* 
 **
 ** Made by Super_Society -- V 0.2.6
 **
@@ -10,7 +10,7 @@
 **
 */
 
-// todo handle failed craft by updating them from serv again if eventCraft fail
+// todo handle failed craft by updating them from serv again if eventCraft fail 
 // todo autocraft : unequip.equip, failcheck
 // todo autorefresh is sock close
 // todo put message if auto crafting is done for one item ? Every time it's found ?
@@ -104,6 +104,10 @@ var BFMainScript = (function() {
 	if (itemValidation(item, settings.General.ChatValidation.Validators)) {
 	    chatActions.addSystemMessage(msg);
 	}
+    }
+  
+    function getSmartSellingRate() {
+      return settings.SmartSelling.Rate;
     }
 
     function deleteItem(part) {
@@ -238,7 +242,6 @@ var BFMainScript = (function() {
 	inventoryActions.update();
 
 	var overload = user.data.inventory.parts.length - (user.data.properties.maxInventory.parts - settings.SmartSelling.MinSpace);
-	console.log("OVERLOAD :", overload)
 	if (overload > 0) {
 	    var itemRequest = [{"Validators": {'tag': tagSell}, "Candidates": []}, {"Validators": {'quality': settings.SmartSelling.DangerousThreshold}, "Candidates": []}];
 	    findItemsCandidatesForRequest(itemRequest, false);
@@ -351,7 +354,7 @@ var BFMainScript = (function() {
 	buildSettings: buildSettings,
 	newItemEvent: newItemEvent,
 	autoCraftSell: autoCraftSell,
-	ZFCRefreshRate: settings.SmartSelling.Rate,
+	getSmartSellingRate: getSmartSellingRate,
     };
 })();
 
@@ -371,19 +374,21 @@ function refreshBFMScript() {
 
     window.BFMainScript = BFMainScript;
     window.BFMainScript.start();
-
-    if (window.BFMainScript.ZFCRefreshRate > 0) {
-	clearInterval(window.BFMainScriptLoop)
-	window.BFMainScript.Interval = setInterval(window.BFMainScript.autoCraftSell, window.BFMainScript.ZFCRefreshRate);
+	console.log("VAL=", window.BFMainScript.getSmartSellingRate())
+    if (window.BFMainScript.getSmartSellingRate() > 0) {
+	if (typeof window.BFMainScript.Interval !== "undefined") {
+      clearInterval(window.BFMainScript.Interval)
+    }
+	window.BFMainScript.Interval = setInterval(window.BFMainScript.autoCraftSell, window.BFMainScript.getSmartSellingRate());
     }
 }
 
 /*** EVENTS CATCHERS ***/
 if (data.scriptEvent === "inventoryFull") {
-    if (window.BFMainScript.ZFCRefreshRate > 0) {
-	clearInterval(window.BFMainScriptLoop)
+    if (window.BFMainScript.getSmartSellingRate() > 0) {
+	clearInterval(window.BFMainScript.Interval)
 	inventoryLib.get();
-	window.BFMainScript.Interval = setInterval(window.BFMainScript.autoCraftSell, window.BFMainScript.ZFCRefreshRate);
+	window.BFMainScript.Interval = setInterval(window.BFMainScript.autoCraftSell, window.BFMainScript.getSmartSellingRate());
     }
 }
 
