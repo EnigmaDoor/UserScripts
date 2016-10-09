@@ -1,4 +1,4 @@
-/* 
+/*
 **
 ** Made by Super_Society -- V 0.2.6
 **
@@ -10,7 +10,7 @@
 **
 */
 
-// todo handle failed craft by updating them from serv again if eventCraft fail 
+// todo handle failed craft by updating them from serv again if eventCraft fail
 // todo autocraft : unequip.equip, failcheck
 // todo autorefresh is sock close
 // todo put message if auto crafting is done for one item ? Every time it's found ?
@@ -105,9 +105,9 @@ var BFMainScript = (function() {
 	    chatActions.addSystemMessage(msg);
 	}
     }
-  
+
     function getSmartSellingRate() {
-      return settings.SmartSelling.Rate;
+	return settings.SmartSelling.Rate;
     }
 
     function deleteItem(part) {
@@ -374,11 +374,11 @@ function refreshBFMScript() {
 
     window.BFMainScript = BFMainScript;
     window.BFMainScript.start();
-	console.log("VAL=", window.BFMainScript.getSmartSellingRate())
+    console.log("VAL=", window.BFMainScript.getSmartSellingRate())
     if (window.BFMainScript.getSmartSellingRate() > 0) {
 	if (typeof window.BFMainScript.Interval !== "undefined") {
-      clearInterval(window.BFMainScript.Interval)
-    }
+	    clearInterval(window.BFMainScript.Interval)
+	}
 	window.BFMainScript.Interval = setInterval(window.BFMainScript.autoCraftSell, window.BFMainScript.getSmartSellingRate());
     }
 }
