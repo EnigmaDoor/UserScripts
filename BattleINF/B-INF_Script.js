@@ -1,6 +1,6 @@
 /* 
 **
-** Made by Super_Society -- V 0.2.5
+** Made by Super_Society -- V 0.2.6
 **
 ** Hello new user !
 ** This script may requires some basic understanding in JS/Scripts.
@@ -13,6 +13,7 @@
 // todo handle failed craft by updating them from serv again if eventCraft fail 
 // todo autocraft : unequip.equip, failcheck
 // todo autorefresh is sock close
+// todo put message if auto crafting is done for one item ? Every time it's found ?
 
 var BFMainScript = (function() {
 
@@ -26,18 +27,11 @@ var BFMainScript = (function() {
 
 	/*** Auto Crafting ***/
 	settings.AutoCrafting[18511484] = {"Desc": "Longbarrel q6 m20", "Validators": {"quality": [2, 4]}};
-	settings.AutoCrafting[18569114] = {"Desc": "gene q5 m20", "Validators": {"quality": [2, 4]}};
-	settings.AutoCrafting[18499262] = {"Desc": "gene q6 m20", "Validators": {"quality": [2, 5]}};
-	settings.AutoCrafting[18698573] = {"Desc": "dual gene q5 m20", "Validators": {"quality": [2, 4]}};
-	settings.AutoCrafting[18601045] = {"Desc": "dual gene q6 m20", "Validators": {"quality": [2, 5]}};
-	settings.AutoCrafting[18577305] = {"Desc": "grip q5 m20", "Validators": {"quality": [2, 4]}};
-	settings.AutoCrafting[18708698] = {"Desc": "longscope q5 m20", "Validators": {"quality": [2, 4]}};
-	//settings.AutoCrafting[18635257] = {"Desc": "longscope q4 m20", "Validators": {"quality": [2, 3]}};
-	settings.AutoCrafting[18777776] = {"Desc": "shortscope q5 m20", "Validators": {"quality": [2, 4]}};
-	//settings.AutoCrafting[18701453] = {"Desc": "shortscope q4 m20", "Validators": {"quality": [2, 4]}};
+	settings.AutoCrafting[18775716] = {"Desc": "longscope q5 m20", "Validators": {"quality": [2, 4]}};
+	settings.AutoCrafting[18701453] = {"Desc": "shortscope q4 m20", "Validators": {"quality": [2, 4]}};
 	settings.AutoCrafting[18775183] = {"Desc": "ammo projec q6 m20", "Validators": {"quality": [2, 5]}};
 	settings.AutoCrafting[18780673] = {"Desc": "shield projec q5 m20", "Validators": {"quality": [2, 5]}};
-	settings.AutoCrafting[18798202] = {"Desc": "shortbarrel q6 m20", "Validators": {"quality": [2, 5]}};
+	settings.AutoCrafting[18798202] = {"Desc": "shortbarrel e q6 m20", "Validators": {"quality": [2, 5]}};
 
 	/*** Zone Filtering -- AutoSeller ***/
 	var ss_types_5 = ['shortScope', 'longScope'];
@@ -361,15 +355,8 @@ var BFMainScript = (function() {
     };
 })();
 
-if (data.scriptEvent === "inventoryFull") {
-    if (window.BFMainScript.ZFCRefreshRate > 0) {
-	clearInterval(window.BFMainScriptLoop)
-	sock.send('user.get');
-	window.BFMainScript.Interval = setInterval(window.BFMainScript.autoCraftSell, window.BFMainScript.ZFCRefreshRate);
-    }
-}
-
-else if (data.scriptEvent === "init" || data.scriptEvent === "scriptSaved") {
+/*** PUBLIC SCOPE FUNCTIONS ***/
+function refreshBFMScript() {
     sock.onevent('newParts', function(data) {
 	user.data.inventory.parts.push(data.parts[0]);
 
@@ -391,8 +378,25 @@ else if (data.scriptEvent === "init" || data.scriptEvent === "scriptSaved") {
     }
 }
 
-/* Fix chat scrolling */
-$(".system-log-container").scrollTop($(".system-log-container")[0].scrollHeight);
+/*** EVENTS CATCHERS ***/
+if (data.scriptEvent === "inventoryFull") {
+    if (window.BFMainScript.ZFCRefreshRate > 0) {
+	clearInterval(window.BFMainScriptLoop)
+	inventoryLib.get();
+	window.BFMainScript.Interval = setInterval(window.BFMainScript.autoCraftSell, window.BFMainScript.ZFCRefreshRate);
+    }
+}
 
-/* Seems to refresh windows when game crash */
-// sock.doOnClose[1] = sock.addDoOnClose(function() { setTimeout(function() { window.location.reload(); }, 7000); });
+else if (data.scriptEvent === "scriptSaved") {
+    refreshBFMScript();
+}
+
+else if (data.scriptEvent === "init") {
+    /* Seems to refresh windows when game crash */
+    sock.addDoOnClose = sock.addDoOnClose(function() { setTimeout(function() { window.location.reload(); }, 5000); });
+
+    refreshBFMScript();
+}
+
+/*** Fix chat scrolling ***/
+$(".system-log-container").scrollTop($(".system-log-container")[0].scrollHeight);
