@@ -1,6 +1,6 @@
 /*
 **
-** Made by Super_Society -- V 0.2.6
+** Made by Super_Society -- V 0.2.7
 **
 ** Hello new user !
 ** This script may requires some basic understanding in JS/Scripts.
@@ -204,7 +204,7 @@ var BFMainScript = (function() {
 	// equipped : user.data.characters[0].constructions.{mainWeapon/shield}.parts[...].part{id/locked/mod/quality}
     }
 
-    function autoCraftSell() {
+    function smartSeller() {
 	var itemRequest = [{"Validators": {'tag': tagSell}, "Candidates": []}, {"Validators": {'quality': settings.SmartSelling.DangerousThreshold}, "Candidates": []}];
 	findItemsCandidatesForRequest(itemRequest, false);
 	var candidatesItem = itemRequest[0].Candidates.concat(itemRequest[1].Candidates);
@@ -353,13 +353,15 @@ var BFMainScript = (function() {
 	start: start,
 	buildSettings: buildSettings,
 	newItemEvent: newItemEvent,
-	autoCraftSell: autoCraftSell,
+	smartSeller: smartSeller,
 	getSmartSellingRate: getSmartSellingRate,
     };
 })();
 
 /*** PUBLIC SCOPE FUNCTIONS ***/
 function refreshBFMScript() {
+    window.BFMainScript = BFMainScript;
+    window.BFMainScript.start();
     sock.onevent('newParts', function(data) {
 	user.data.inventory.parts.push(data.parts[0]);
 
@@ -372,23 +374,20 @@ function refreshBFMScript() {
 	ScriptAPI.execute(data);
     });
 
-    window.BFMainScript = BFMainScript;
-    window.BFMainScript.start();
-    console.log("VAL=", window.BFMainScript.getSmartSellingRate())
     if (window.BFMainScript.getSmartSellingRate() > 0) {
-	if (typeof window.BFMainScript.Interval !== "undefined") {
-	    clearInterval(window.BFMainScript.Interval)
+	if (typeof window.BFMainScript_Interval !== "undefined") {
+	    clearInterval(window.BFMainScript_Interval)
 	}
-	window.BFMainScript.Interval = setInterval(window.BFMainScript.autoCraftSell, window.BFMainScript.getSmartSellingRate());
+	window.BFMainScript_Interval = setInterval(window.BFMainScript.smartSeller, window.BFMainScript.getSmartSellingRate());
     }
 }
 
 /*** EVENTS CATCHERS ***/
 if (data.scriptEvent === "inventoryFull") {
     if (window.BFMainScript.getSmartSellingRate() > 0) {
-	clearInterval(window.BFMainScript.Interval)
+	clearInterval(window.BFMainScript_Interval)
 	inventoryLib.get();
-	window.BFMainScript.Interval = setInterval(window.BFMainScript.autoCraftSell, window.BFMainScript.getSmartSellingRate());
+	window.BFMainScript_Interval = setInterval(window.BFMainScript.smartSeller, window.BFMainScript.getSmartSellingRate());
     }
 }
 
