@@ -4,7 +4,8 @@
 **
 ** Hello new user !
 ** This script may requires some basic understanding in JS/Scripts.
-** ==> Read the documentation carefully at <==
+**		==> Read the documentation carefully at <==
+** ==> https://github.com/SyntacticSaIt/UserScripts/tree/master/BattleINF <==
 ** Any questions asked without reading the doc wont be answered.
 **
 */
