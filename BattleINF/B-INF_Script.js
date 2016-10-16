@@ -55,7 +55,7 @@ var BFMainScript = (function() {
 	settings.SmartSelling.MinSpace = 5;
 	settings.SmartSelling.DeclutterOrder = [["mod", false], ["quality", false], ["plus", true]];
 	/* WARNING THIS IS THE ONLY VALUE CAPABLE OF BREAKING YOUR EXISTING ITEMS. Existing items in this quality threshold (inclusive) will be edited/sold ! */
-	settings.SmartSelling.DangerousThreshold = [0, 2];
+	settings.SmartSelling.DangerousThreshold = [0, 1];
 
 	/* END OF buildSettings() */
 	initializeSettings();
