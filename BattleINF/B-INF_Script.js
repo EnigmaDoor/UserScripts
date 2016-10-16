@@ -1,6 +1,6 @@
 /*
 **
-** Made by Super_Society -- V 0.3.0
+** Made by Super_Society -- V 0.3.1
 **
 ** Hello new user !
 ** This script may requires some basic understanding in JS/Scripts.
@@ -10,7 +10,7 @@
 **
 */
 
-// todo in doc separate zone filtering é smart selling
+// todo in doc separate zone filtering & smart selling
 // todo doc GridFusing
 // todo doc precise order of execution : auto crafting > zone filtering > grid fusing > smart selling
 
@@ -183,7 +183,7 @@ var BFMainScript = (function() {
 		    }
 		} else if (Object.prototype.toString.call(el[attrib[i]]) === '[object Object]') {
 		    for (var y = 0; y < valid[attrib[i]].length && isValid; y++) {
-			if (el[attrib[i]].indexOf(valid[attrib[i]][y]) === -1) {
+			if (! el[attrib[i]].hasOwnProperty(valid[attrib[i]][y])) {
 			    isValid = false;
 			}
 		    }
@@ -350,8 +350,9 @@ var BFMainScript = (function() {
 	if (newItem !== undefined) {
 	    if (newItem.quality <= fusing.limits.quality) {
 		for (var i = 0; i < settings.GridFusing.Cells.length; i++) {
-		    if (itemValidation(newItem, settings.GridFusing.Cells[i])) {
+		    if (itemValidation(newItem, settings.GridFusing.Cells[i].Validators)) {
 			fusingLib.fuse(newItem.id, settings.GridFusing.Cells[i].x, settings.GridFusing.Cells[i].y);
+			validateChatMessage(newItem, 'Fuse <b class="rarity-' + newItem.quality + '-text">[+' + newItem.plus + ' %' + newItem.mod + '] ' + newItem.name + '</b>');
 			newItem = undefined;
 			break;
 		    }
