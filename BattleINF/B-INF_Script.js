@@ -1,13 +1,11 @@
 /*
-**
-** Made by Super_Society -- V 0.3.1
+** Made by Super_Society -- V 0.3.2
 **
 ** Hello new user !
 ** This script may requires some basic understanding in JS/Scripts.
 **		==> Read the documentation carefully at <==
 ** ==> https://github.com/SyntacticSaIt/UserScripts/tree/master/BattleINF <==
 ** Any questions asked without reading the doc wont be answered.
-**
 */
 
 // todo in doc separate zone filtering & smart selling
@@ -29,25 +27,32 @@ var BFMainScript = (function() {
 	settings.General.ChatValidation = {"Validators": {"quality": [0, 128]}};
 
 	/*** Auto Crafting ***/
-	settings.AutoCrafting[18511484] = {"Desc": "Longbarrel q6 m20", "Validators": {"quality": [2, 4]}};
-	settings.AutoCrafting[18775716] = {"Desc": "longscope q5 m20", "Validators": {"quality": [2, 4]}};
-	settings.AutoCrafting[18701453] = {"Desc": "shortscope q4 m20", "Validators": {"quality": [2, 4]}};
-	settings.AutoCrafting[18775183] = {"Desc": "ammo projec q6 m20", "Validators": {"quality": [2, 5]}};
-	settings.AutoCrafting[18780673] = {"Desc": "shield projec q5 m20", "Validators": {"quality": [2, 5]}};
-	settings.AutoCrafting[18798202] = {"Desc": "shortbarrel e q6 m20", "Validators": {"quality": [2, 5]}};
+	//settings.AutoCrafting[20765833] = {"Desc": "shield q6 m20", "Validators": {"quality": [1, 3]}};
+	settings.AutoCrafting[20768150] = {"Desc": "shield q5 m20", "Validators": {"quality": [1, 3]}};
+	settings.AutoCrafting[20766905] = {"Desc": "doubshield q5 m20", "Validators": {"quality": [1, 3]}};
+	settings.AutoCrafting[20762881] = {"Desc": "shieldproj q4 m3", "Validators": {"quality": [0, 2]}};
+	settings.AutoCrafting[20771648] = {"Desc": "ammoproj q2 m20", "Validators": {"quality": [0, 2]}};
+	settings.AutoCrafting[20764941] = {"Desc": "longbarrel q2 m20", "Validators": {"quality": [0, 2]}};
+	settings.AutoCrafting[20767769] = {"Desc": "longbarrel e q2 m20", "Validators": {"quality": [0, 2]}};
+	settings.AutoCrafting[20767920] = {"Desc": "barrelclip q2 m20", "Validators": {"quality": [0, 2]}};
 
 	/*** Zone Filtering ***/
-	var ss_types_5 = ['shortScope', 'longScope'];
-	var ss_types_6 = ['longBarrelExtended', 'shortBarrelExtended'];
-	var ss_types_7 = ['barrelClip', 'verticalGrip', 'shieldGenerator', 'dualBatteryShieldGenerator', 'shieldProjector'];
-	var ss_extends = ['barrelExtender','barrelSplitterTwo','barrelSplitterThree'];
-	settings.ZoneFiltering[0] = {"Validators": [{"quality": [7, 8]}]};
-	settings.ZoneFiltering[91] = {"Validators": [{"quality": [4, 7], "type": ss_types_5},
-						     {"quality": [5, 7], "type": ss_types_6},
-						     {"quality": [6, 7], "type": ss_types_7}]};
-
+	var ss_types_5 = [];
+	var ss_types_6 = ['shortScope', 'longScope'];
+	var ss_extends = ['shieldConnector','barrelExtender','barrelSplitterTwo','barrelSplitterThree'];
+	settings.ZoneFiltering[0] = {"Validators": [{"quality": [5, 8]}]};
+	settings.ZoneFiltering[91] = {"Validators": [
+	    //{"quality": [6, 7], "type": 'barrelClip', "reload": 8},
+	    //{"quality": [5, 7], "type": ss_types_5},
+	    //{"quality": 5, "type": ss_extends},
+	    {"quality": [6, 7], "type": ss_types_6}]};
+	
 	/*** GridFusing ***/
 	settings.GridFusing.Cells.push({"x": 1, "y": 1, "Desc": "Recharge", "Validators": {"stats": ["recharge"]}});
+	settings.GridFusing.Cells.push({"x": 1, "y": 1, "Desc": "Energy", "Validators": {"stats": ["energy"]}});
+	settings.GridFusing.Cells.push({"x": 8, "y": 2, "Desc": "Clip", "Validators": {"stats": ["clip"]}});
+	settings.GridFusing.Cells.push({"x": 7, "y": 0, "Desc": "Aim", "Validators": {"stats": ["aim"]}});
+	settings.GridFusing.Cells.push({"x": 7, "y": 1, "Desc": "FireRate", "Validators": {"stats": ["fireRate"]}});
 
 	/*** Smart Selling ***/
 	settings.SmartSelling.Rate = 1000;
@@ -352,7 +357,8 @@ var BFMainScript = (function() {
 		for (var i = 0; i < settings.GridFusing.Cells.length; i++) {
 		    if (itemValidation(newItem, settings.GridFusing.Cells[i].Validators)) {
 			fusingLib.fuse(newItem.id, settings.GridFusing.Cells[i].x, settings.GridFusing.Cells[i].y);
-			validateChatMessage(newItem, 'Fuse <b class="rarity-' + newItem.quality + '-text">[+' + newItem.plus + ' %' + newItem.mod + '] ' + newItem.name + '</b>');
+			validateChatMessage(newItem, '[' + settings.GridFusing.Cells[i].x + '/' + settings.GridFusing.Cells[i].y + '] ' +
+					    '<= <b class="rarity-' + newItem.quality + '-text">[+' + newItem.plus + ' %' + newItem.mod + '] ' + newItem.name + '</b>');
 			newItem = undefined;
 			break;
 		    }

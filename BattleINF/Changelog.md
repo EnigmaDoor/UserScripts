@@ -1,4 +1,7 @@
-	# Actual version : v0.3.1
+	# Actual version : v0.3.2
+
+	### v0.3.2
+	Edited my prefs, edited chat display for fusing
 
 	### v0.3.1
 	Fixed some bugs
