@@ -1,6 +1,6 @@
 /*
 **
-** Made by Super_Society -- V 0.2.7
+** Made by Super_Society -- V 0.3.0
 **
 ** Hello new user !
 ** This script may requires some basic understanding in JS/Scripts.
@@ -10,15 +10,18 @@
 **
 */
 
-// todo handle failed craft by updating them from serv again if eventCraft fail
+// todo in doc separate zone filtering é smart selling
+// todo doc GridFusing
+// todo doc precise order of execution : auto crafting > zone filtering > grid fusing > smart selling
+
+// todo handle failed craft by updating them from serv again if eventCraft fail -- & fuse too
 // todo autocraft : unequip.equip, failcheck
-// todo autorefresh is sock close
 // todo put message if auto crafting is done for one item ? Every time it's found ?
 
 var BFMainScript = (function() {
 
     /*** SETTINGS ***/
-    var settings = {"General": {}, "AutoCrafting": {}, "ZoneFiltering": {}, "SmartSelling": {}};
+    var settings = {"General": {}, "AutoCrafting": {}, "ZoneFiltering": {}, "GridFusing": {"Cells": []}, "SmartSelling": {}};
 
     var buildSettings = function () {
 	/*** General Settings ***/
@@ -33,7 +36,7 @@ var BFMainScript = (function() {
 	settings.AutoCrafting[18780673] = {"Desc": "shield projec q5 m20", "Validators": {"quality": [2, 5]}};
 	settings.AutoCrafting[18798202] = {"Desc": "shortbarrel e q6 m20", "Validators": {"quality": [2, 5]}};
 
-	/*** Zone Filtering -- AutoSeller ***/
+	/*** Zone Filtering ***/
 	var ss_types_5 = ['shortScope', 'longScope'];
 	var ss_types_6 = ['longBarrelExtended', 'shortBarrelExtended'];
 	var ss_types_7 = ['barrelClip', 'verticalGrip', 'shieldGenerator', 'dualBatteryShieldGenerator', 'shieldProjector'];
@@ -42,6 +45,9 @@ var BFMainScript = (function() {
 	settings.ZoneFiltering[91] = {"Validators": [{"quality": [4, 7], "type": ss_types_5},
 						     {"quality": [5, 7], "type": ss_types_6},
 						     {"quality": [6, 7], "type": ss_types_7}]};
+
+	/*** GridFusing ***/
+	settings.GridFusing.Cells.push({"x": 1, "y": 1, "Desc": "Recharge", "Validators": {"stats": ["recharge"]}});
 
 	/*** Smart Selling ***/
 	settings.SmartSelling.Rate = 1000;
@@ -58,6 +64,9 @@ var BFMainScript = (function() {
     var initializeSettings = function () {
 	for (var key in settings.AutoCrafting) {
 	    settings.AutoCrafting[key].Candidates = [];
+	}
+	for (var i = 0; i < settings.GridFusing.Cells.length; i++) {
+	    settings.GridFusing.Cells[i].Candidates = [];
 	}
     };
 
@@ -130,8 +139,8 @@ var BFMainScript = (function() {
 
     function craftItem(prim, consum, isMuted) {
 	if (typeof(isMuted) === 'undefined') isMuted = false;
-	if (prim.quality > crafting.limits.rarity
-	    || consum.quality > crafting.limits.rarity
+	if (prim.quality > crafting.limits.quality
+	    || consum.quality > crafting.limits.quality
 	    || prim.plus + consum.plus + 1 > maxPlus(prim)) {
 	    return false;
 	}
@@ -167,15 +176,23 @@ var BFMainScript = (function() {
 			isValid = false;
 		    }
 		} else if (Object.prototype.toString.call(el[attrib[i]]) === '[object Array]') {
-		    if (false) {
-			isValid = false; // TODO not yet managed
+		    for (var y = 0; y < valid[attrib[i]].length && isValid; y++) {
+			if (el[attrib[i]].indexOf(valid[attrib[i]][y]) === -1) {
+			    isValid = false;
+			}
+		    }
+		} else if (Object.prototype.toString.call(el[attrib[i]]) === '[object Object]') {
+		    for (var y = 0; y < valid[attrib[i]].length && isValid; y++) {
+			if (el[attrib[i]].indexOf(valid[attrib[i]][y]) === -1) {
+			    isValid = false;
+			}
 		    }
 		} else if (Object.prototype.toString.call(el[attrib[i]]) === '[object String]') {
 		    if (valid[attrib[i]].indexOf(el[attrib[i]]) === -1) {
 			isValid = false;
 		    }
 		}
-	    } else {
+	    } else { // TODO : case if valid is object object
 		if (! (el.hasOwnProperty(attrib[i])
 		       && el[attrib[i]] === valid[attrib[i]])) {
 		    isValid = false;
@@ -268,7 +285,7 @@ var BFMainScript = (function() {
 	inventoryActions.update();
     }
 
-    /*** TREATMENT ***/
+    /***** TREATMENT *****/
     var newItemEvent = function(newItem) {
 	var userLoc = user.data.lastAreaId in settings.ZoneFiltering ? user.data.lastAreaId : 0;
 
@@ -318,33 +335,52 @@ var BFMainScript = (function() {
 		    break;
 		}
 	    }
-	    /* if item isn't valid, remove it, else ignore */
-	    if (isValid === false) {
-		if (settings.SmartSelling.Rate === 0) {
-		    newItem = deleteItem(newItem);
-		} else if (newItem.quality > crafting.limits.rarity) {
-		    newItem = deleteItem(newItem);
-		} else {
-		    if (newItem.quality < settings.SmartSelling.DangerousThreshold[0] /* Absolute Rarity where request is */
-			|| newItem.quality > settings.SmartSelling.DangerousThreshold[1]) { /* avoided and spared */
-			inventoryLib.setPartTag(newItem, tagSell);
-		    }
-		    newItem = undefined; /* Candidates will also find newItem ! */
-		}
+
+	    /* newItem is valid, keep it. */
+	    if (isValid) {
+		inventoryActions.lockPart(newItem);
+		validateChatMessage(newItem, 'Got <b class="rarity-' + newItem.quality + '-text">' + newItem.name + '</b>');
+		newItem = undefined;
 	    }
+
 	}
 	/*** END Smart Zone Filtering ***/
 
-	/* If newItem survived, list in chat */
+	/*** START Grid Fusing ***/
 	if (newItem !== undefined) {
-	    inventoryActions.lockPart(newItem);
-	    validateChatMessage(newItem, 'Got <b class="rarity-' + newItem.quality + '-text">' + newItem.name + '</b>');
+	    if (newItem.quality <= fusing.limits.quality) {
+		for (var i = 0; i < settings.GridFusing.Cells.length; i++) {
+		    if (itemValidation(newItem, settings.GridFusing.Cells[i])) {
+			fusingLib.fuse(newItem.id, settings.GridFusing.Cells[i].x, settings.GridFusing.Cells[i].y);
+			newItem = undefined;
+			break;
+		    }
+		}
+	    }
 	}
+	/*** END Grid Fusing ***/
+
+	/*** START Smart Selling ***/
+	if (newItem !== undefined) {
+	    if (settings.SmartSelling.Rate === 0) {
+		newItem = deleteItem(newItem);
+	    } else if (newItem.quality > crafting.limits.quality) {
+		newItem = deleteItem(newItem);
+	    } else {
+		if (newItem.quality < settings.SmartSelling.DangerousThreshold[0] /* Absolute Rarity where request is */
+		    || newItem.quality > settings.SmartSelling.DangerousThreshold[1]) { /* avoided and spared */
+		    inventoryLib.setPartTag(newItem, tagSell);
+		}
+	    }
+	    newItem = undefined;
+	}
+	/*** END Smart Selling ***/
     };
 
     /*** START ***/
     var start = function () {
 	craftingActions.getCraftingLimits();
+	fusingLib.getFusingLimits();
 	buildSettings();
     };
 
