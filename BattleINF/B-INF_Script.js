@@ -1,5 +1,5 @@
 /*
-** Made by Super_Society -- V 0.3.2
+** Made by Super_Society -- V 0.3.4
 **
 ** Hello new user !
 ** This script may requires some basic understanding in JS/Scripts.
@@ -19,57 +19,63 @@
 var BFMainScript = (function() {
 
     /*** SETTINGS ***/
-    var settings = {"General": {}, "AutoCrafting": {}, "ZoneFiltering": {}, "GridFusing": {"Cells": []}, "SmartSelling": {}};
+    var settings = {"General": {}, "AutoCrafting": {"Patterns": []}, "ZoneFiltering": {}, "GridFusing": {"Cells": []}, "SmartSelling": {}};
 
     var buildSettings = function () {
 	/*** General Settings ***/
 	settings.General.EditEquipped = true;
-	settings.General.ChatValidation = {"Validators": {"quality": [0, 128]}};
+	settings.General.ChatValidation = {"Validators": {"quality": [3, 128]}};
 
 	/*** Auto Crafting ***/
-	//settings.AutoCrafting[20765833] = {"Desc": "shield q6 m20", "Validators": {"quality": [1, 3]}};
-	settings.AutoCrafting[20768150] = {"Desc": "shield q5 m20", "Validators": {"quality": [1, 3]}};
-	settings.AutoCrafting[20766905] = {"Desc": "doubshield q5 m20", "Validators": {"quality": [1, 3]}};
-	settings.AutoCrafting[20762881] = {"Desc": "shieldproj q4 m3", "Validators": {"quality": [0, 2]}};
-	settings.AutoCrafting[20771648] = {"Desc": "ammoproj q2 m20", "Validators": {"quality": [0, 2]}};
-	settings.AutoCrafting[20764941] = {"Desc": "longbarrel q2 m20", "Validators": {"quality": [0, 2]}};
-	settings.AutoCrafting[20767769] = {"Desc": "longbarrel e q2 m20", "Validators": {"quality": [0, 2]}};
-	settings.AutoCrafting[20767920] = {"Desc": "barrelclip q2 m20", "Validators": {"quality": [0, 2]}};
+	settings.AutoCrafting.Patterns.push({"Primary": {"quality": 7}, "Desc": "All quality 7", "Consumed": {"quality": [3, 6]}});
 
-	/*** Zone Filtering ***/
+	settings.AutoCrafting.Patterns.push({"Primary": {"id": 23486206}, "Desc": "L Scope q6 m15", "Consumed": {"quality": [2, 6]}});
+	settings.AutoCrafting.Patterns.push({"Primary": {"id": 23656393}, "Desc": "L Scope q6 m15", "Consumed": {"quality": [2, 6]}});
+	settings.AutoCrafting.Patterns.push({"Primary": {"id": 23654701}, "Desc": "S Scope q6 m15", "Consumed": {"quality": [2, 6]}});
+	settings.AutoCrafting.Patterns.push({"Primary": {"id": 23655900}, "Desc": "S Scope q6 m15", "Consumed": {"quality": [2, 6]}});
+	settings.AutoCrafting.Patterns.push({"Primary": {"id": 23655145}, "Desc": "2way q6 m15", "Consumed": {"quality": [2, 6]}});
+	settings.AutoCrafting.Patterns.push({"Primary": {"id": 23655679}, "Desc": "router B q6 m15", "Consumed": {"quality": [2, 6]}});
+	settings.AutoCrafting.Patterns.push({"Primary": {"id": 23655885}, "Desc": "3way q6 m15", "Consumed": {"quality": [2, 6]}});
+	settings.AutoCrafting.Patterns.push({"Primary": {"id": 23655435}, "Desc": "3way q6 m15", "Consumed": {"quality": [2, 6]}});
+	settings.AutoCrafting.Patterns.push({"Primary": {"id": 23655915}, "Desc": "dualGen q6 m15", "Consumed": {"quality": [2, 6]}});
+	settings.AutoCrafting.Patterns.push({"Primary": {"id": 23656089}, "Desc": "S Proj q6 m15", "Consumed": {"quality": [2, 6]}});
+	settings.AutoCrafting.Patterns.push({"Primary": {"id": 23656118}, "Desc": "Gen q6 m15", "Consumed": {"quality": [2, 6]}});
+	settings.AutoCrafting.Patterns.push({"Primary": {"id": 23656864}, "Desc": "S B E q6 m15", "Consumed": {"quality": [2, 6]}});
+
 	var ss_types_5 = [];
-	var ss_types_6 = ['shortScope', 'longScope'];
+	var ss_types_6 = ['shortScope', 'longScope', 'shortBarrelExtended', 'bottomBatteryHorizontalB'];
 	var ss_extends = ['shieldConnector','barrelExtender','barrelSplitterTwo','barrelSplitterThree'];
-	settings.ZoneFiltering[0] = {"Validators": [{"quality": [5, 8]}]};
-	settings.ZoneFiltering[91] = {"Validators": [
-	    //{"quality": [6, 7], "type": 'barrelClip', "reload": 8},
-	    //{"quality": [5, 7], "type": ss_types_5},
-	    //{"quality": 5, "type": ss_extends},
-	    {"quality": [6, 7], "type": ss_types_6}]};
-	
+	settings.ZoneFiltering[0] = {"Validators": [
+      	    {"quality": [7, 25]},
+            {"mod": [10, 25], "quality": [6, 15]}, {"mod": [10, 25], "quality": [6, 15], "type": ss_types_6},
+            {"mod": [16, 25], "quality": [5, 15]},
+	]};
+
+	/*settings.ZoneFiltering[91] = {"Validators": [
+	//{"quality": [6, 7], "type": 'barrelClip', "reload": 8},
+	//{"quality": [5, 7], "type": ss_types_5},
+	//{"quality": 5, "type": ss_extends},
+	{"quality": [4, 7], "type": ss_types_6}]};*/
+
 	/*** GridFusing ***/
-	settings.GridFusing.Cells.push({"x": 1, "y": 1, "Desc": "Recharge", "Validators": {"stats": ["recharge"]}});
-	settings.GridFusing.Cells.push({"x": 1, "y": 1, "Desc": "Energy", "Validators": {"stats": ["energy"]}});
-	settings.GridFusing.Cells.push({"x": 8, "y": 2, "Desc": "Clip", "Validators": {"stats": ["clip"]}});
-	settings.GridFusing.Cells.push({"x": 7, "y": 0, "Desc": "Aim", "Validators": {"stats": ["aim"]}});
-	settings.GridFusing.Cells.push({"x": 7, "y": 1, "Desc": "FireRate", "Validators": {"stats": ["fireRate"]}});
+	settings.GridFusing.Cells.push({"x": 2, "y": 2, "Desc": "Recharge", "Validators": {"stats": ["recharge"]}});
+	//settings.GridFusing.Cells.push({"x": 2, "y": 8, "Desc": "Clip", "Validators": {"stats": ["clip"]}});
+	settings.GridFusing.Cells.push({"x": 0, "y": 7, "Desc": "Aim", "Validators": {"stats": ["aim"]}});
+	//settings.GridFusing.Cells.push({"x": 1, "y": 7, "Desc": "Velocity", "Validators": {"stats": ["velocity"]}});
 
 	/*** Smart Selling ***/
-	settings.SmartSelling.Rate = 1000;
-	settings.SmartSelling.MinQuality = 2;
+	settings.SmartSelling.Rate = 2500;
+	settings.SmartSelling.MinQuality = 3;
 	settings.SmartSelling.MinSpace = 5;
 	settings.SmartSelling.DeclutterOrder = [["mod", false], ["quality", false], ["plus", true]];
 	/* WARNING THIS IS THE ONLY VALUE CAPABLE OF BREAKING YOUR EXISTING ITEMS. Existing items in this quality threshold (inclusive) will be edited/sold ! */
-	settings.SmartSelling.DangerousThreshold = [0, 1];
+	settings.SmartSelling.DangerousThreshold = [0, 2];
 
 	/* END OF buildSettings() */
 	initializeSettings();
     };
 
     var initializeSettings = function () {
-	for (var key in settings.AutoCrafting) {
-	    settings.AutoCrafting[key].Candidates = [];
-	}
 	for (var i = 0; i < settings.GridFusing.Cells.length; i++) {
 	    settings.GridFusing.Cells[i].Candidates = [];
 	}
@@ -106,8 +112,6 @@ var BFMainScript = (function() {
     /* Tags */
     var tagVoid = 0;
     var tagSell = 1;
-    var tagKeep = 2;
-    var tag3 = 4;
 
     /*** HELPFUL FUNCTIONS ***/
     function isInt(nb) {
@@ -207,22 +211,25 @@ var BFMainScript = (function() {
 	return isValid;
     }
 
-    function itemsFiltering(el, idx, obj) {
+    function itemsFiltering(el, idx, obj, input, output) {
+	input = typeof input !== 'undefined' ? input : "Validators";
+	output = typeof output !== 'undefined' ? output : "Candidates";
+
 	var isItemValid = false;
 	for (var i = 0; i < this.length; i++) {
-	    var isValid = itemValidation(el, this[i].Validators);
+	    var isValid = itemValidation(el, this[i][input]);
 	    if (isValid === true) {
-		this[i].Candidates.push(el);
+		this[i][output].push(el);
 		isItemValid |= isValid;
 	    }
 	}
 	return isItemValid;
     }
 
-    function findItemsCandidatesForRequest(requests, searchEquip) {
+    function findItemsCandidatesForRequest(requests, searchEquip, input, output) {
 	if (searchEquip === true) {
 	}
-	user.data.inventory.parts.filter(itemsFiltering, requests);
+	user.data.inventory.parts.filter(itemsFiltering, requests, input, output);
 	// equipped : user.data.characters[0].constructions.{mainWeapon/shield}.parts[...].part{id/locked/mod/quality}
     }
 
@@ -296,34 +303,26 @@ var BFMainScript = (function() {
 
 	/*** START Auto Craft ***/
 	if (newItem !== undefined) {
-	    var requestPrimaryItems = [];
-	    for (var key in settings.AutoCrafting) {
-		requestPrimaryItems.push({"Validators": {"id": parseInt(key)}, "Candidates": []}); /* Create a request for each Primary Item... */
+	    for (var i = 0; i < settings.AutoCrafting.Patterns.length; i++) {
+		settings.AutoCrafting.Patterns[i].PrimCand = [];
 	    }
-	    findItemsCandidatesForRequest(requestPrimaryItems, settings.General.EditEquipped); /* ... And retrieve them */
-	    for (var i = 0; i < requestPrimaryItems.length; i++) { /* Now retrieve mod/type from them and apply it to Consumed Validators */
-		if (requestPrimaryItems[i].Candidates.length > 0) {
-		    var candidate = requestPrimaryItems[i].Candidates[0];
-		    settings.AutoCrafting[candidate.id].ItemRef = candidate;
-		    settings.AutoCrafting[candidate.id].Validators.mod = candidate.mod;
-		    settings.AutoCrafting[candidate.id].Validators.type = candidate.type;
-		}
-	    }
-	    for (var key in settings.AutoCrafting) { /* Now check if newItem match any craft order */
-		if (settings.AutoCrafting[key].hasOwnProperty("ItemRef")
-		    && itemValidation(newItem, settings.AutoCrafting[key].Validators)) {
-		    if (craftItem(settings.AutoCrafting[key].ItemRef, newItem) === true) {
-			newItem = undefined; /* render it unusable if craftItem succeed */
-			break;
+	    findItemsCandidatesForRequest(settings.AutoCrafting.Patterns, settings.General.EditEquipped, "Primary", "PrimCand"); /* For all primary, find candidates */
+	    for (var i = 0; i < settings.AutoCrafting.Patterns.length && newItem !== undefined; i++) { /* Add requests made from Consumed + Mod/type from PrimCand */
+		for (var j = 0; j < settings.AutoCrafting.Patterns[i].PrimCand.length && newItem !== undefined; j++) {
+		    var req = jQuery.extend(true, {}, settings.AutoCrafting.Patterns[i].Consumed);
+		    req.mod = settings.AutoCrafting.Patterns[i].PrimCand[j].mod;
+		    req.type = settings.AutoCrafting.Patterns[i].PrimCand[j].type;
+		    if (itemValidation(newItem, req)					/* If newItem validate this request, try craft */
+			&& craftItem(settings.AutoCrafting.Patterns[i].PrimCand[j], newItem) === true) {
+			newItem = undefined
 		    }
 		}
 	    }
+	    for (var i = 0; i < settings.AutoCrafting.Patterns.length; i++) {
+		delete settings.AutoCrafting.Patterns[i].PrimCand;
+	    }
 	}
 	/*** END Auto Craft ***/
-	// First TODO helper function who crawl v in search of ID. Return dict with ID founds, and location, and isEquipped
-	// equipped : user.data.characters[0].constructions.{mainWeapon/shield}.parts[...].part{id/locked/mod/quality}
-	// inventory : user.data.inventory.parts[..]{id/...}
-	// Then TODO compare types/stats etc... first to validate => unequip/craft/equip
 
 	/*** START Smart Zone Filtering ***/
 	if (newItem !== undefined) {
@@ -424,12 +423,13 @@ function refreshBFMScript() {
 	window.BFMainScript_Interval = setInterval(window.BFMainScript.smartSeller, window.BFMainScript.getSmartSellingRate());
     }
 }
-
+console.log(data);
 /*** EVENTS CATCHERS ***/
 if (data.scriptEvent === "inventoryFull") {
     if (window.BFMainScript.getSmartSellingRate() > 0) {
 	clearInterval(window.BFMainScript_Interval)
 	inventoryLib.get();
+	window.BFMainScript.smartSeller();
 	window.BFMainScript_Interval = setInterval(window.BFMainScript.smartSeller, window.BFMainScript.getSmartSellingRate());
     }
 }
@@ -446,4 +446,4 @@ else if (data.scriptEvent === "init") {
 }
 
 /*** Fix chat scrolling ***/
-$(".system-log-container").scrollTop($(".system-log-container")[0].scrollHeight);
+//$(".system-log-container").scrollTop($(".system-log-container")[0].scrollHeight);

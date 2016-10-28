@@ -1,5 +1,8 @@
 	# Actual version : v0.3.2
 
+	### v0.3.4
+	AutoCrafting now uses Validators for primary items, instead of ID
+
 	### v0.3.2
 	Edited my prefs, edited chat display for fusing
 
