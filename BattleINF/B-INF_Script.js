@@ -12,7 +12,6 @@
 
 // todo handle failed craft by updating them from serv again if eventCraft fail
 // todo autocraft : unequip.equip, failcheck
-// todo autorefresh is sock close
 // todo put message if auto crafting is done for one item ? Every time it's found ?
 
 var BFMainScript = (function() {
