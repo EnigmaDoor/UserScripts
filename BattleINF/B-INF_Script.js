@@ -42,6 +42,7 @@ var BFMainScript = (function() {
 	settings.AutoCrafting.Patterns.push({"Validators": {"id": 23656118}, "Desc": "Gen q6 m15", "Consumed": {"quality": [2, 6]}});
 	settings.AutoCrafting.Patterns.push({"Validators": {"id": 23656864}, "Desc": "S B E q6 m15", "Consumed": {"quality": [2, 6]}});
 
+	/*** Zone Filtering ***/
 	var ss_types_5 = [];
 	var ss_types_6 = ['shortScope', 'longScope', 'shortBarrelExtended', 'bottomBatteryHorizontalB'];
 	var ss_extends = ['shieldConnector','barrelExtender','barrelSplitterTwo','barrelSplitterThree'];
