@@ -27,20 +27,20 @@ var BFMainScript = (function() {
 	settings.General.ChatValidation = {"Validators": {"quality": [3, 128]}};
 
 	/*** Auto Crafting ***/
-	settings.AutoCrafting.Patterns.push({"Primary": {"quality": 7}, "Desc": "All quality 7", "Consumed": {"quality": [3, 6]}});
+	settings.AutoCrafting.Patterns.push({"Validators": {"quality": 7}, "Desc": "All quality 7", "Consumed": {"quality": [3, 6]}});
 
-	settings.AutoCrafting.Patterns.push({"Primary": {"id": 23486206}, "Desc": "L Scope q6 m15", "Consumed": {"quality": [2, 6]}});
-	settings.AutoCrafting.Patterns.push({"Primary": {"id": 23656393}, "Desc": "L Scope q6 m15", "Consumed": {"quality": [2, 6]}});
-	settings.AutoCrafting.Patterns.push({"Primary": {"id": 23654701}, "Desc": "S Scope q6 m15", "Consumed": {"quality": [2, 6]}});
-	settings.AutoCrafting.Patterns.push({"Primary": {"id": 23655900}, "Desc": "S Scope q6 m15", "Consumed": {"quality": [2, 6]}});
-	settings.AutoCrafting.Patterns.push({"Primary": {"id": 23655145}, "Desc": "2way q6 m15", "Consumed": {"quality": [2, 6]}});
-	settings.AutoCrafting.Patterns.push({"Primary": {"id": 23655679}, "Desc": "router B q6 m15", "Consumed": {"quality": [2, 6]}});
-	settings.AutoCrafting.Patterns.push({"Primary": {"id": 23655885}, "Desc": "3way q6 m15", "Consumed": {"quality": [2, 6]}});
-	settings.AutoCrafting.Patterns.push({"Primary": {"id": 23655435}, "Desc": "3way q6 m15", "Consumed": {"quality": [2, 6]}});
-	settings.AutoCrafting.Patterns.push({"Primary": {"id": 23655915}, "Desc": "dualGen q6 m15", "Consumed": {"quality": [2, 6]}});
-	settings.AutoCrafting.Patterns.push({"Primary": {"id": 23656089}, "Desc": "S Proj q6 m15", "Consumed": {"quality": [2, 6]}});
-	settings.AutoCrafting.Patterns.push({"Primary": {"id": 23656118}, "Desc": "Gen q6 m15", "Consumed": {"quality": [2, 6]}});
-	settings.AutoCrafting.Patterns.push({"Primary": {"id": 23656864}, "Desc": "S B E q6 m15", "Consumed": {"quality": [2, 6]}});
+	settings.AutoCrafting.Patterns.push({"Validators": {"id": 23486206}, "Desc": "L Scope q6 m15", "Consumed": {"quality": [2, 6]}});
+	settings.AutoCrafting.Patterns.push({"Validators": {"id": 23656393}, "Desc": "L Scope q6 m15", "Consumed": {"quality": [2, 6]}});
+	settings.AutoCrafting.Patterns.push({"Validators": {"id": 23654701}, "Desc": "S Scope q6 m15", "Consumed": {"quality": [2, 6]}});
+	settings.AutoCrafting.Patterns.push({"Validators": {"id": 23655900}, "Desc": "S Scope q6 m15", "Consumed": {"quality": [2, 6]}});
+	settings.AutoCrafting.Patterns.push({"Validators": {"id": 23655145}, "Desc": "2way q6 m15", "Consumed": {"quality": [2, 6]}});
+	settings.AutoCrafting.Patterns.push({"Validators": {"id": 23655679}, "Desc": "router B q6 m15", "Consumed": {"quality": [2, 6]}});
+	settings.AutoCrafting.Patterns.push({"Validators": {"id": 23655885}, "Desc": "3way q6 m15", "Consumed": {"quality": [2, 6]}});
+	settings.AutoCrafting.Patterns.push({"Validators": {"id": 23655435}, "Desc": "3way q6 m15", "Consumed": {"quality": [2, 6]}});
+	settings.AutoCrafting.Patterns.push({"Validators": {"id": 23655915}, "Desc": "dualGen q6 m15", "Consumed": {"quality": [2, 6]}});
+	settings.AutoCrafting.Patterns.push({"Validators": {"id": 23656089}, "Desc": "S Proj q6 m15", "Consumed": {"quality": [2, 6]}});
+	settings.AutoCrafting.Patterns.push({"Validators": {"id": 23656118}, "Desc": "Gen q6 m15", "Consumed": {"quality": [2, 6]}});
+	settings.AutoCrafting.Patterns.push({"Validators": {"id": 23656864}, "Desc": "S B E q6 m15", "Consumed": {"quality": [2, 6]}});
 
 	var ss_types_5 = [];
 	var ss_types_6 = ['shortScope', 'longScope', 'shortBarrelExtended', 'bottomBatteryHorizontalB'];
@@ -211,25 +211,22 @@ var BFMainScript = (function() {
 	return isValid;
     }
 
-    function itemsFiltering(el, idx, obj, input, output) {
-	input = typeof input !== 'undefined' ? input : "Validators";
-	output = typeof output !== 'undefined' ? output : "Candidates";
-
+    function itemsFiltering(el, idx, obj) {
 	var isItemValid = false;
 	for (var i = 0; i < this.length; i++) {
-	    var isValid = itemValidation(el, this[i][input]);
+	    var isValid = itemValidation(el, this[i].Validators);
 	    if (isValid === true) {
-		this[i][output].push(el);
+		this[i].Candidates.push(el);
 		isItemValid |= isValid;
 	    }
 	}
 	return isItemValid;
     }
 
-    function findItemsCandidatesForRequest(requests, searchEquip, input, output) {
-	if (searchEquip === true) {
-	}
-	user.data.inventory.parts.filter(itemsFiltering, requests, input, output);
+function findItemsCandidatesForRequest(requests, searchEquip) {
+    if (searchEquip === true) {
+    }
+    user.data.inventory.parts.filter(itemsFiltering, requests);
 	// equipped : user.data.characters[0].constructions.{mainWeapon/shield}.parts[...].part{id/locked/mod/quality}
     }
 
@@ -304,22 +301,22 @@ var BFMainScript = (function() {
 	/*** START Auto Craft ***/
 	if (newItem !== undefined) {
 	    for (var i = 0; i < settings.AutoCrafting.Patterns.length; i++) {
-		settings.AutoCrafting.Patterns[i].PrimCand = [];
+		settings.AutoCrafting.Patterns[i].Candidates = [];
 	    }
-	    findItemsCandidatesForRequest(settings.AutoCrafting.Patterns, settings.General.EditEquipped, "Primary", "PrimCand"); /* For all primary, find candidates */
-	    for (var i = 0; i < settings.AutoCrafting.Patterns.length && newItem !== undefined; i++) { /* Add requests made from Consumed + Mod/type from PrimCand */
-		for (var j = 0; j < settings.AutoCrafting.Patterns[i].PrimCand.length && newItem !== undefined; j++) {
+	    findItemsCandidatesForRequest(settings.AutoCrafting.Patterns, settings.General.EditEquipped); /* For all primary, find candidates */
+	    for (var i = 0; i < settings.AutoCrafting.Patterns.length && newItem !== undefined; i++) { /* Add requests made from Consumed + Mod/type from Candidates */
+		for (var j = 0; j < settings.AutoCrafting.Patterns[i].Candidates.length && newItem !== undefined; j++) {
 		    var req = jQuery.extend(true, {}, settings.AutoCrafting.Patterns[i].Consumed);
-		    req.mod = settings.AutoCrafting.Patterns[i].PrimCand[j].mod;
-		    req.type = settings.AutoCrafting.Patterns[i].PrimCand[j].type;
+		    req.mod = settings.AutoCrafting.Patterns[i].Candidates[j].mod;
+		    req.type = settings.AutoCrafting.Patterns[i].Candidates[j].type;
 		    if (itemValidation(newItem, req)					/* If newItem validate this request, try craft */
-			&& craftItem(settings.AutoCrafting.Patterns[i].PrimCand[j], newItem) === true) {
+			&& craftItem(settings.AutoCrafting.Patterns[i].Candidates[j], newItem) === true) {
 			newItem = undefined
 		    }
 		}
 	    }
 	    for (var i = 0; i < settings.AutoCrafting.Patterns.length; i++) {
-		delete settings.AutoCrafting.Patterns[i].PrimCand;
+		delete settings.AutoCrafting.Patterns[i].Candidates;
 	    }
 	}
 	/*** END Auto Craft ***/
