@@ -24,32 +24,23 @@ var BFMainScript = (function() {
     var buildSettings = function () {
 	/*** General Settings ***/
 	settings.General.EditEquipped = true;
-	settings.General.ChatValidation = {"Validators": {"quality": [3, 128]}};
+	settings.General.ChatValidation = {"Validators": {"quality": [2, 128]}};
 
 	/*** Auto Crafting ***/
 	settings.AutoCrafting.Patterns.push({"Validators": {"quality": 7}, "Desc": "All quality 7", "Consumed": {"quality": [3, 6]}});
+	settings.AutoCrafting.Patterns.push({"Validators": {"quality": 6, "mod": 16}, "Desc": "All quality 6", "Consumed": {"quality": [2, 6]}});
+	settings.AutoCrafting.Patterns.push({"Validators": {"quality": 5, "mod": 16}, "Desc": "All quality 5", "Consumed": {"quality": [2, 5]}});
 
-	settings.AutoCrafting.Patterns.push({"Validators": {"id": 23486206}, "Desc": "L Scope q6 m15", "Consumed": {"quality": [2, 6]}});
-	settings.AutoCrafting.Patterns.push({"Validators": {"id": 23656393}, "Desc": "L Scope q6 m15", "Consumed": {"quality": [2, 6]}});
-	settings.AutoCrafting.Patterns.push({"Validators": {"id": 23654701}, "Desc": "S Scope q6 m15", "Consumed": {"quality": [2, 6]}});
-	settings.AutoCrafting.Patterns.push({"Validators": {"id": 23655900}, "Desc": "S Scope q6 m15", "Consumed": {"quality": [2, 6]}});
-	settings.AutoCrafting.Patterns.push({"Validators": {"id": 23655145}, "Desc": "2way q6 m15", "Consumed": {"quality": [2, 6]}});
-	settings.AutoCrafting.Patterns.push({"Validators": {"id": 23655679}, "Desc": "router B q6 m15", "Consumed": {"quality": [2, 6]}});
-	settings.AutoCrafting.Patterns.push({"Validators": {"id": 23655885}, "Desc": "3way q6 m15", "Consumed": {"quality": [2, 6]}});
-	settings.AutoCrafting.Patterns.push({"Validators": {"id": 23655435}, "Desc": "3way q6 m15", "Consumed": {"quality": [2, 6]}});
-	settings.AutoCrafting.Patterns.push({"Validators": {"id": 23655915}, "Desc": "dualGen q6 m15", "Consumed": {"quality": [2, 6]}});
-	settings.AutoCrafting.Patterns.push({"Validators": {"id": 23656089}, "Desc": "S Proj q6 m15", "Consumed": {"quality": [2, 6]}});
-	settings.AutoCrafting.Patterns.push({"Validators": {"id": 23656118}, "Desc": "Gen q6 m15", "Consumed": {"quality": [2, 6]}});
-	settings.AutoCrafting.Patterns.push({"Validators": {"id": 23656864}, "Desc": "S B E q6 m15", "Consumed": {"quality": [2, 6]}});
+	//settings.AutoCrafting.Patterns.push({"Validators": {"id": 23486206}, "Desc": "L Scope q6 m15", "Consumed": {"quality": [2, 6]}});
 
-	/*** Zone Filtering ***/
-	var ss_types_5 = [];
-	var ss_types_6 = ['shortScope', 'longScope', 'shortBarrelExtended', 'bottomBatteryHorizontalB'];
+	var ss_types_5 = ['energyRouterB'];
+	var ss_types_6 = ['shortScope', 'longScope'];
 	var ss_extends = ['shieldConnector','barrelExtender','barrelSplitterTwo','barrelSplitterThree'];
 	settings.ZoneFiltering[0] = {"Validators": [
       	    {"quality": [7, 25]},
-            {"mod": [10, 25], "quality": [6, 15]}, {"mod": [10, 25], "quality": [6, 15], "type": ss_types_6},
-            {"mod": [16, 25], "quality": [5, 15]},
+            {"mod": [15], "quality": [3, 6], "type": "barrelSplitterTwo"}, // to level up the 7* 2way
+            {"mod": [16, 25], "quality": [5, 15], "type": ss_types_6},
+            {"mod": [16, 25], "quality": [6, 15]},
 	]};
 
 	/*settings.ZoneFiltering[91] = {"Validators": [
@@ -62,10 +53,10 @@ var BFMainScript = (function() {
 	settings.GridFusing.Cells.push({"x": 2, "y": 2, "Desc": "Recharge", "Validators": {"stats": ["recharge"]}});
 	//settings.GridFusing.Cells.push({"x": 2, "y": 8, "Desc": "Clip", "Validators": {"stats": ["clip"]}});
 	settings.GridFusing.Cells.push({"x": 0, "y": 7, "Desc": "Aim", "Validators": {"stats": ["aim"]}});
-	//settings.GridFusing.Cells.push({"x": 1, "y": 7, "Desc": "Velocity", "Validators": {"stats": ["velocity"]}});
+	settings.GridFusing.Cells.push({"x": 1, "y": 7, "Desc": "Velocity", "Validators": {"stats": ["velocity"]}});
 
 	/*** Smart Selling ***/
-	settings.SmartSelling.Rate = 2500;
+	settings.SmartSelling.Rate = 4000;
 	settings.SmartSelling.MinQuality = 3;
 	settings.SmartSelling.MinSpace = 5;
 	settings.SmartSelling.DeclutterOrder = [["mod", false], ["quality", false], ["plus", true]];
@@ -149,7 +140,8 @@ var BFMainScript = (function() {
 
     function craftItem(prim, consum, isMuted) {
 	if (typeof(isMuted) === 'undefined') isMuted = false;
-	if (prim.quality > crafting.limits.quality
+	if (prim.id === consum.id
+	    || prim.quality > crafting.limits.quality
 	    || consum.quality > crafting.limits.quality
 	    || prim.plus + consum.plus + 1 > maxPlus(prim)) {
 	    return false;
@@ -310,7 +302,7 @@ function findItemsCandidatesForRequest(requests, searchEquip) {
 		    var req = jQuery.extend(true, {}, settings.AutoCrafting.Patterns[i].Consumed);
 		    req.mod = settings.AutoCrafting.Patterns[i].Candidates[j].mod;
 		    req.type = settings.AutoCrafting.Patterns[i].Candidates[j].type;
-		    if (itemValidation(newItem, req)					/* If newItem validate this request, try craft */
+		    if (req.id !== newItem.id && itemValidation(newItem, req)				/* If newItem validate this request, try craft */
 			&& craftItem(settings.AutoCrafting.Patterns[i].Candidates[j], newItem) === true) {
 			newItem = undefined
 		    }
