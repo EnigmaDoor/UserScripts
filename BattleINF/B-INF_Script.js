@@ -47,7 +47,7 @@ var BFMainScript = (function() {
       	    {"quality": [7, 25]},
             {"mod": 15, "quality": [3, 6], "type": "barrelSplitterTwo"}, // to level up the 7* 2way
             {"mod": [23, 99], "quality": [6, 15], "type": ss_types},
-	    {"mod": [23, 99], "quality": [5, 6], "type": dataSymTypes},
+	    {"mod": [23, 99], "quality": [5, 6], "type": dataSimTypes},
             //{"mod": [16, 25], "quality": [6, 15]},
 	]};
 
