@@ -28,37 +28,45 @@ var BFMainScript = (function() {
 
 	/*** Auto Crafting ***/
 	settings.AutoCrafting.Patterns.push({"Validators": {"quality": 7}, "Desc": "All quality 7", "Consumed": {"quality": [3, 6]}});
-	settings.AutoCrafting.Patterns.push({"Validators": {"quality": 6, "mod": 16}, "Desc": "All quality 6", "Consumed": {"quality": [2, 6]}});
-	settings.AutoCrafting.Patterns.push({"Validators": {"quality": 5, "mod": 16}, "Desc": "All quality 5", "Consumed": {"quality": [2, 5]}});
+	settings.AutoCrafting.Patterns.push({"Validators": {"quality": 7, "type": "barrelExtender"}, "Desc": "Extenders quality 7", "Consumed": {"quality": [0, 2]}});
+	settings.AutoCrafting.Patterns.push({"Validators": {"quality": 6, "mod": [16, 30]}, "Desc": "All quality 6", "Consumed": {"quality": [3, 6]}});
+	settings.AutoCrafting.Patterns.push({"Validators": {"quality": 5, "mod": [16, 30]}, "Desc": "All quality 5", "Consumed": {"quality": [2, 5]}});
 
 	//settings.AutoCrafting.Patterns.push({"Validators": {"id": 23486206}, "Desc": "L Scope q6 m15", "Consumed": {"quality": [2, 6]}});
 
-	var ss_types_5 = ['energyRouterB'];
-	var ss_types_6 = ['shortScope', 'longScope'];
-	var ss_extends = ['shieldConnector','barrelExtender','barrelSplitterTwo','barrelSplitterThree'];
+	var ss_types = ['longScope', 'shortScope',
+			//'shieldProjector', 'ammoProjector',
+			//'dualBatteryShieldGenerator',
+			'bottomBatterySmall', 'bottomBatteryLargeA', //'bottomBatteryLargeB',
+			//'shieldConnectorA', 'shieldConnectorB',
+			//'energyRouterA', 'energyRouterB',
+			//'rocketBarrel',
+			'barrelSplitterTwo', 'barrelSplitterThree', //'barrelExtender',
+                       ];
 	settings.ZoneFiltering[0] = {"Validators": [
       	    {"quality": [7, 25]},
-            {"mod": [15], "quality": [3, 6], "type": "barrelSplitterTwo"}, // to level up the 7* 2way
-            {"mod": [16, 25], "quality": [5, 15], "type": ss_types_6},
-            {"mod": [16, 25], "quality": [6, 15]},
+            {"mod": 15, "quality": [3, 6], "type": "barrelSplitterTwo"}, // to level up the 7* 2way
+            {"mod": [23, 99], "quality": [6, 15], "type": ss_types},
+	    {"mod": [23, 99], "quality": [5, 6], "type": dataSymTypes},
+            //{"mod": [16, 25], "quality": [6, 15]},
 	]};
 
-	/*settings.ZoneFiltering[91] = {"Validators": [
-	//{"quality": [6, 7], "type": 'barrelClip', "reload": 8},
-	//{"quality": [5, 7], "type": ss_types_5},
-	//{"quality": 5, "type": ss_extends},
-	{"quality": [4, 7], "type": ss_types_6}]};*/
-
 	/*** GridFusing ***/
-	settings.GridFusing.Cells.push({"x": 2, "y": 2, "Desc": "Recharge", "Validators": {"stats": ["recharge"]}});
-	//settings.GridFusing.Cells.push({"x": 2, "y": 8, "Desc": "Clip", "Validators": {"stats": ["clip"]}});
-	settings.GridFusing.Cells.push({"x": 0, "y": 7, "Desc": "Aim", "Validators": {"stats": ["aim"]}});
-	settings.GridFusing.Cells.push({"x": 1, "y": 7, "Desc": "Velocity", "Validators": {"stats": ["velocity"]}});
+	settings.GridFusing.Cells.push({"x": 2, "y": 2, "Desc": "Recharge", "Validators": {"stats": ["recharge"], "quality": [0, 6]}});
+	//settings.GridFusing.Cells.push({"x": 2, "y": 8, "Desc": "Clip", "Validators": {"stats": ["clip"], "quality": [0, 6]}});
+	settings.GridFusing.Cells.push({"x": 0, "y": 7, "Desc": "Aim", "Validators": {"stats": ["aim"], "quality": [0, 6]}});
+	settings.GridFusing.Cells.push({"x": 1, "y": 7, "Desc": "Velocity", "Validators": {"stats": ["velocity"], "quality": [0, 6]}});
 
+	settings.GridFusing.Cells.push({"x": 2, "y": 2, "Desc": "SIMQuality", "Validators": {"stats": ["simulationQualityMagnifier"], "quality": [0, 1]}});
+	settings.GridFusing.Cells.push({"x": 1, "y": 4, "Desc": "SIMGravity", "Validators": {"stats": ["simulationGravityBooster"], "quality": [0, 1]}});
+	settings.GridFusing.Cells.push({"x": 4, "y": 3, "Desc": "SIMCharge", "Validators": {"stats": ["simulationCharge"], "quality": [0, 1]}});
+	settings.GridFusing.Cells.push({"x": 3, "y": 5, "Desc": "SIMShieldReg", "Validators": {"stats": ["simulationShieldRegenMultiplier"], "quality": [0, 1]}});
+	settings.GridFusing.Cells.push({"x": 2, "y": 7, "Desc": "SIMDamage", "Validators": {"stats": ["simulationDamageMultiplier"], "quality": [0, 1]}});
+	
 	/*** Smart Selling ***/
 	settings.SmartSelling.Rate = 4000;
 	settings.SmartSelling.MinQuality = 3;
-	settings.SmartSelling.MinSpace = 5;
+	settings.SmartSelling.MinSpace = 3;
 	settings.SmartSelling.DeclutterOrder = [["mod", false], ["quality", false], ["plus", true]];
 	/* WARNING THIS IS THE ONLY VALUE CAPABLE OF BREAKING YOUR EXISTING ITEMS. Existing items in this quality threshold (inclusive) will be edited/sold ! */
 	settings.SmartSelling.DangerousThreshold = [0, 2];
@@ -85,7 +93,11 @@ var BFMainScript = (function() {
     var dataGunStructuralTypes = ['barrelExtender','barrelSplitterTwo','barrelSplitterThree','verticalGrip','stock'];
     var dataGunClipTypes = ['clip','uClip','barrelClip'];
     var dataGunTypes = dataGunBarrelTypes.concat(dataGunScopeTypes).concat(dataGunStructuralTypes).concat(dataGunClipTypes);
-    var dataTypes = dataShieldTypes.concat(dataGunTypes);
+    var dataSimEssentialTypes = ['simulationCombatant', 'simulationCharge'];
+    var dataSimBoosterTypes = ['simulationQualityMagnifier', 'simulationChallengeMod', 'simulationGravityBooster'];
+    var dataSimPlayerTypes = ['simulationShieldRegenMultiplier', 'simulationAmmoRegenMultiplier', 'simulationDamageMultiplier'];
+    var dataSimTypes = dataSimEssentialTypes.concat(dataSimBoosterTypes).concat(dataSimPlayerTypes);
+    var dataTypes = dataShieldTypes.concat(dataGunTypes).concat(dataSimTypes);
 
     /* Zones */
     var dataZones = {"Town": 22,
@@ -216,10 +228,10 @@ var BFMainScript = (function() {
 	return isItemValid;
     }
 
-function findItemsCandidatesForRequest(requests, searchEquip) {
-    if (searchEquip === true) {
-    }
-    user.data.inventory.parts.filter(itemsFiltering, requests);
+    function findItemsCandidatesForRequest(requests, searchEquip) {
+	if (searchEquip === true) {
+	}
+	user.data.inventory.parts.filter(itemsFiltering, requests);
 	// equipped : user.data.characters[0].constructions.{mainWeapon/shield}.parts[...].part{id/locked/mod/quality}
     }
 
